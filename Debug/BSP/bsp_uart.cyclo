@@ -1,4 +1,0 @@
-../BSP/bsp_uart.c:24:6:Debug_Print	1
-../BSP/bsp_uart.c:36:6:USART1_Init	1
-../BSP/bsp_uart.c:42:6:ProcessCommandLine	10
-../BSP/bsp_uart.c:110:6:HAL_UART_RxCpltCallback	6

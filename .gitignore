@@ -1,14 +1,17 @@
 # STM32CubeIDE specific
-.vscode\
-Debug\BSP
-Debug\Core
-Debug\Drivers
-Release\
-.ipch\
+.vscode/
+# Ignore everything inside the Debug folder *except* root Debug files
+/Debug/*
+!/Debug/*.*
+/Debug/BSP/
+/Debug/Core/
+/Debug/Drivers/
+/Release/
+.ipch/
 .cproject
 .project
-.settings\
-stm32cubemx\
+.settings/
+stm32cubemx/
 *.map
 *.lst
 *.suo
