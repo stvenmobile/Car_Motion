@@ -6,6 +6,7 @@
 /Debug/BSP/
 /Debug/Core/
 /Debug/Drivers/
+/Drivers/
 /Release/
 .ipch/
 .cproject
