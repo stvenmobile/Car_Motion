@@ -1,0 +1,144 @@
+Configuration	Car_Motion
+STM32CubeMX 	6.13.0
+Date	03/05/2025
+MCU	STM32F103RCTx
+
+
+
+PERIPHERALS	MODES	FUNCTIONS	PINS
+RCC	Crystal/Ceramic Resonator	RCC_OSC_IN	PD0-OSC_IN
+RCC	Crystal/Ceramic Resonator	RCC_OSC_OUT	PD1-OSC_OUT
+SYS	Serial Wire	SYS_JTCK-SWCLK	PA14
+SYS	Serial Wire	SYS_JTMS-SWDIO	PA13
+SYS	SysTick	SYS_VS_Systick	VP_SYS_VS_Systick
+TIM1	Internal Clock	TIM1_VS_ClockSourceINT	VP_TIM1_VS_ClockSourceINT
+TIM1	PWM Generation CH1	TIM1_CH1	PA8
+TIM1	PWM Generation CH2N	TIM1_CH2N	PB0
+TIM1	PWM Generation CH3N	TIM1_CH3N	PB1
+TIM1	PWM Generation CH4	TIM1_CH4	PA11
+TIM2	Encoder Mode	TIM2_CH1	PA15
+TIM2	Encoder Mode	TIM2_CH2	PB3
+TIM3	Encoder Mode	TIM3_CH1	PA6
+TIM3	Encoder Mode	TIM3_CH2	PA7
+TIM4	Encoder Mode	TIM4_CH1	PB6
+TIM4	Encoder Mode	TIM4_CH2	PB7
+TIM5	Encoder Mode	TIM5_CH1	PA0-WKUP
+TIM5	Encoder Mode	TIM5_CH2	PA1
+TIM8	Internal Clock	TIM8_VS_ClockSourceINT	VP_TIM8_VS_ClockSourceINT
+TIM8	PWM Generation CH1	TIM8_CH1	PC6
+TIM8	PWM Generation CH2	TIM8_CH2	PC7
+TIM8	PWM Generation CH3	TIM8_CH3	PC8
+TIM8	PWM Generation CH4	TIM8_CH4	PC9
+USART1	Asynchronous	USART1_RX	PA10
+USART1	Asynchronous	USART1_TX	PA9
+
+
+
+Pin Nb	PINs	FUNCTIONs	LABELs
+2	PC13-TAMPER-RTC	GPIO_Output	LED
+5	PD0-OSC_IN	RCC_OSC_IN	
+6	PD1-OSC_OUT	RCC_OSC_OUT	
+14	PA0-WKUP	TIM5_CH1	
+15	PA1	TIM5_CH2	
+22	PA6	TIM3_CH1	
+23	PA7	TIM3_CH2	
+25	PC5	GPIO_Output	BEEP
+26	PB0	TIM1_CH2N	
+27	PB1	TIM1_CH3N	
+37	PC6	TIM8_CH1	
+38	PC7	TIM8_CH2	
+39	PC8	TIM8_CH3	
+40	PC9	TIM8_CH4	
+41	PA8	TIM1_CH1	
+42	PA9	USART1_TX	
+43	PA10	USART1_RX	
+44	PA11	TIM1_CH4	
+46	PA13	SYS_JTMS-SWDIO	
+49	PA14	SYS_JTCK-SWCLK	
+50	PA15	TIM2_CH1	
+54	PD2	GPIO_Input	KEY1
+55	PB3	TIM2_CH2	
+58	PB6	TIM4_CH1	
+59	PB7	TIM4_CH2	
+PERIPHERALS	MODES	FUNCTIONS	PINS
+RCC	Crystal/Ceramic Resonator	RCC_OSC_IN	PD0-OSC_IN
+RCC	Crystal/Ceramic Resonator	RCC_OSC_OUT	PD1-OSC_OUT
+SYS	Serial Wire	SYS_JTCK-SWCLK	PA14
+SYS	Serial Wire	SYS_JTMS-SWDIO	PA13
+SYS	SysTick	SYS_VS_Systick	VP_SYS_VS_Systick
+TIM1	Internal Clock	TIM1_VS_ClockSourceINT	VP_TIM1_VS_ClockSourceINT
+TIM1	PWM Generation CH1	TIM1_CH1	PA8
+TIM1	PWM Generation CH2N	TIM1_CH2N	PB0
+TIM1	PWM Generation CH3N	TIM1_CH3N	PB1
+TIM1	PWM Generation CH4	TIM1_CH4	PA11
+TIM2	Encoder Mode	TIM2_CH1	PA15
+TIM2	Encoder Mode	TIM2_CH2	PB3
+TIM3	Encoder Mode	TIM3_CH1	PA6
+TIM3	Encoder Mode	TIM3_CH2	PA7
+TIM4	Encoder Mode	TIM4_CH1	PB6
+TIM4	Encoder Mode	TIM4_CH2	PB7
+TIM5	Encoder Mode	TIM5_CH1	PA0-WKUP
+TIM5	Encoder Mode	TIM5_CH2	PA1
+TIM8	Internal Clock	TIM8_VS_ClockSourceINT	VP_TIM8_VS_ClockSourceINT
+TIM8	PWM Generation CH1	TIM8_CH1	PC6
+TIM8	PWM Generation CH2	TIM8_CH2	PC7
+TIM8	PWM Generation CH3	TIM8_CH3	PC8
+TIM8	PWM Generation CH4	TIM8_CH4	PC9
+USART1	Asynchronous	USART1_RX	PA10
+USART1	Asynchronous	USART1_TX	PA9
+
+
+
+Pin Nb	PINs	FUNCTIONs	LABELs
+2	PC13-TAMPER-RTC	GPIO_Output	LED
+5	PD0-OSC_IN	RCC_OSC_IN	
+6	PD1-OSC_OUT	RCC_OSC_OUT	
+14	PA0-WKUP	TIM5_CH1	
+15	PA1	TIM5_CH2	
+22	PA6	TIM3_CH1	
+23	PA7	TIM3_CH2	
+25	PC5	GPIO_Output	BEEP
+26	PB0	TIM1_CH2N	
+27	PB1	TIM1_CH3N	
+37	PC6	TIM8_CH1	
+38	PC7	TIM8_CH2	
+39	PC8	TIM8_CH3	
+40	PC9	TIM8_CH4	
+41	PA8	TIM1_CH1	
+42	PA9	USART1_TX	
+43	PA10	USART1_RX	
+44	PA11	TIM1_CH4	
+46	PA13	SYS_JTMS-SWDIO	
+49	PA14	SYS_JTCK-SWCLK	
+50	PA15	TIM2_CH1	
+54	PD2	GPIO_Input	KEY1
+55	PB3	TIM2_CH2	
+58	PB6	TIM4_CH1	
+59	PB7	TIM4_CH2	
+
+
+
+SOFTWARE PROJECT
+
+Project Settings : 
+Project Name : Car_Motion
+Project Folder : F:\STM32_workspace\Car_Motion
+Toolchain / IDE : STM32CubeIDE
+Firmware Package Name and Version : STM32Cube FW_F1 V1.8.6
+
+
+Code Generation Settings : 
+STM32Cube MCU packages and embedded software packs : Copy only the necessary library files
+Generate peripheral initialization as a pair of '.c/.h' files per peripheral : Yes
+Backup previously generated files when re-generating : No
+Delete previously generated files when not re-generated : Yes
+Set all free pins as analog (to optimize the power consumption) : No
+
+
+Toolchains Settings : 
+Compiler Optimizations : 
+
+
+
+
+

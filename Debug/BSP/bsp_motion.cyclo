@@ -1,0 +1,14 @@
+../BSP/bsp_motion.c:28:6:Motion_Set_Pwm	9
+../BSP/bsp_motion.c:61:6:Motion_Set_Speed	2
+../BSP/bsp_motion.c:50:6:Motion_Stop	1
+../BSP/bsp_motion.c:126:7:Motion_Get_APB	1
+../BSP/bsp_motion.c:136:7:Motion_Get_Circle_MM	1
+../BSP/bsp_motion.c:143:6:Motion_Get_Encoder	2
+../BSP/bsp_motion.c:81:6:Motion_Get_Speed	2
+../BSP/bsp_motion.c:157:6:Motion_Ctrl	14
+../BSP/bsp_motion.c:205:6:Motion_Handle	2
+../BSP/bsp_motion.c:216:6:Handle_Velocity_4	1
+../BSP/bsp_motion.c:240:6:Handle_Directional	11
+../BSP/bsp_motion.c:314:6:Handle_Info_Encoders	1
+../BSP/bsp_motion.c:329:6:Handle_Info_ResetEncoders	2
+../BSP/bsp_motion.c:351:6:Handle_Info_Battery	1

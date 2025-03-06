@@ -1,0 +1,32 @@
+# STM32CubeIDE specific
+.vscode\
+Debug\BSP
+Debug\Core
+Debug\Drivers
+Release\
+.ipch\
+.cproject
+.project
+.settings\
+stm32cubemx\
+*.map
+*.lst
+*.suo
+*.o
+*.d
+*.dcu
+*.bak
+*.swp
+*.swn
+*.tmp
+*.log
+*.out
+*.dep
+*.dat
+*.a
+*.lib
+
+# System files
+.DS_Store
+Thumbs.db
+desktop.ini
