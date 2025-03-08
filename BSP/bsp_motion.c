@@ -1,8 +1,9 @@
+#include "bsp.h"
 #include "bsp_motion.h"
 #include "bsp_encoder.h"
 #include "bsp_uart.h"
 #include "bsp_motor.h"
-#include "bsp.h"
+#include "bsp_pid.h"
 
 #include "main.h"    // For GPIO Port and Pin definitions
 #include "tim.h"     // For Timer handles
@@ -10,18 +11,13 @@
 #include <stdio.h>
 
 
-
-
 int32_t g_Encoder_All_Now[MAX_MOTOR] = {0};
 int g_Encoder_All_Last[MAX_MOTOR] = {0};
-
 int g_Encoder_All_Offset[MAX_MOTOR] = {0};
 
 uint8_t g_start_ctrl = 0;
 
 car_data_t car_data;
-motor_data_t motor_data;
-
 
 
 // Control car movement, Motor_X=[-3600, 3600], beyond the range is invalid. 
@@ -96,31 +92,31 @@ void Motion_Get_Speed(car_data_t* car)
 
     if (g_start_ctrl)
     {
+        // ✅ Update actual speeds for PID calculations
         motor_data.speed_mm_s[0] = speed_m1;
         motor_data.speed_mm_s[1] = speed_m2;
         motor_data.speed_mm_s[2] = speed_m3;
         motor_data.speed_mm_s[3] = speed_m4;
+
+        // ✅ Ensure PID target values are set correctly
+        for (int i = 0; i < 4; i++)
+        {
+            pid_motor[i].target_val = motor_data.speed_set[i];
+        }
+
         PID_Calc_Motor(&motor_data);
     }
 
     static uint32_t loop_counter = 0;
     if (loop_counter >= 0)
     {
-        //Debug_Print("Encoder Offsets: M1=%ld, M2=%ld, M3=%ld, M4=%ld\r\n",
-           // g_Encoder_All_Offset[0],
-           // g_Encoder_All_Offset[1],
-           // g_Encoder_All_Offset[2],
-           // g_Encoder_All_Offset[3]);
-
-        //Debug_Print("Speed Calculations: M1=%.2f mm/s, M2=%.2f mm/s, M3=%.2f mm/s, M4=%.2f mm/s\r\n",
-           // speed_m1,
-           // speed_m2,
-           // speed_m3,
-           // speed_m4);
+        // Debugging print statements (optional)
+        // Debug_Print("Speed M1=%.2f mm/s, M2=%.2f mm/s, M3=%.2f mm/s, M4=%.2f mm/s\r\n",
+        //             speed_m1, speed_m2, speed_m3, speed_m4);
         loop_counter = 0;
     }
-
 }
+
 
 // Returns half of the sum of the current cart wheel axles
 float Motion_Get_APB(void)

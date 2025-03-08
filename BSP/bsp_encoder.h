@@ -4,9 +4,8 @@
 #include "stdint.h"
 
 
-// 轮子转一整圈，编码器获得的脉冲数:30*11*2*2
-// One full turn of the wheel, the number of pulses picked up by the coder: 30*11*2*2
-#define ENCODER_CIRCLE           (1320)
+// One full turn of the wheel, the number of pulses picked up by the coder: 55*11*2*2
+#define ENCODER_CIRCLE           (2420)
 
 void Encoder_Init(void);
 void Encoder_Update_Count(void);

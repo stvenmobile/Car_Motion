@@ -1,7 +1,6 @@
 #ifndef __BSP_H__
 #define __BSP_H__
 
-/* Import HAL related library  导入HAL相关库 */
 #include "main.h"
 #include "gpio.h"
 #include "tim.h"
@@ -9,14 +8,10 @@
 #include "stm32f1xx_hal.h"
 #include "stm32f103xe.h"
 #include "bsp_beep.h"
-#include "bsp_key.h"
-#include "bsp_motor.h"
 #include "bsp_encoder.h"
-#include "bsp_uart.h"
-#include "bsp_motion.h"
-#include "bsp_pid.h"
 #include "stdio.h"
 
+#define MAX_MOTOR 4  // Ensure it's only defined once
 
 /* DEFINE */
 #define LED_ON()         HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, SET)

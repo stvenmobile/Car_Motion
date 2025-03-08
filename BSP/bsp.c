@@ -18,7 +18,7 @@ static void Bsp_Led_Show_State_Handle(void)
 // The peripheral device is initialized
 void Bsp_Init(void)
 {
-	//Beep_On_Time(50);
+	Beep_On_Time(50);
 	Motor_Init();
 	Encoder_Init();
 	PID_Param_Init();
@@ -32,7 +32,7 @@ int car_state = 0;
 void Bsp_Loop(void)
 {
 	Bsp_Led_Show_State_Handle();
-	//Beep_Timeout_Close_Handle();
+	Beep_Timeout_Close_Handle();
 	Encoder_Update_Count();
 	Motion_Handle();
 	//Command_Handler();

@@ -15,6 +15,8 @@
 
 void Beep_Timeout_Close_Handle(void);
 void Beep_On_Time(uint16_t time);
+void Beep_Off();
+
 
 
 #endif

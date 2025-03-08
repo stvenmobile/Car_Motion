@@ -1,34 +1,37 @@
+#include "bsp.h"
+#include "bsp_motor.h"
 #include "bsp_pid.h"
 #include "bsp_uart.h"
-#include "bsp.h"
+#include "bsp_motion.h"
+#include <string.h>
 
 
 #define PI      (3.1415926f)
 
-motor_pid_t pid_motor[4];
+#include "bsp_pid.h"
 
+motor_pid_t pid_motor[MAX_MOTOR] = {0};  // ✅ Correct name
 
-// Example Initialize PID parameters 初始化PID参数
+motor_data_t motor_data;
+
 void PID_Param_Init(void)
 {
     for (int i = 0; i < MAX_MOTOR; i++)
     {
         pid_motor[i].target_val = 0.0;
         pid_motor[i].pwm_output = 0.0;
+        pid_motor[i].Kp = PID_KP;
+        pid_motor[i].Ki = PID_KI;
+        pid_motor[i].Kd = PID_KD;
         pid_motor[i].err = 0.0;
         pid_motor[i].err_last = 0.0;
         pid_motor[i].err_next = 0.0;
         pid_motor[i].integral = 0.0;
-
-        pid_motor[i].Kp = PID_DEF_KP;
-        pid_motor[i].Ki = PID_DEF_KI;
-        pid_motor[i].Kd = PID_DEF_KD;
     }
 }
 
 // Incremental PID calculation formula
 float PID_Incre_Calc(motor_pid_t *pid, float actual_val, int motor_index)
-
 {
     pid->err = pid->target_val - actual_val;
     pid->pwm_output += pid->Kp * (pid->err - pid->err_next)
@@ -41,23 +44,26 @@ float PID_Incre_Calc(motor_pid_t *pid, float actual_val, int motor_index)
     if (pid->pwm_output > MOTOR_MAX_PULSE)  pid->pwm_output = MOTOR_MAX_PULSE;
     if (pid->pwm_output < -MOTOR_MAX_PULSE) pid->pwm_output = -MOTOR_MAX_PULSE;
 
-    // Debug print to monitor PID calculations
+    // Debug print to monitor PID calculations (only every 10 cycles)
     static uint32_t loop_counter = 0;
     loop_counter++;
     if (loop_counter >= 10)  // Adjust this value for desired frequency
     {
-        Debug_Print("PID Debug: Motor=%d, Target=%.2f, Actual=%.2f, Error=%.2f, PWM=%.2f\r\n",
-                    motor_index,
-                    pid->target_val,
-                    actual_val,
-                    pid->err,
-                    pid->pwm_output);
+        // Info PID print (for STM32 PID tuning)
+        // **Send PID info over UART to Raspberry Pi**
+        char serial_msg[128];
+        snprintf(serial_msg, sizeof(serial_msg),
+                 "I PID[%d]: Target=%.2f, Actual=%.2f, Error=%.2f, PWM=%.2f\r\n",
+                 motor_index, pid->target_val, actual_val, pid->err, pid->pwm_output);
+        USART1_Send_ArrayU8((uint8_t *)serial_msg, strlen(serial_msg));
+
         loop_counter = 0;
     }
 
     // Ensure correct type casting to int32_t for motor control
     return (int32_t)pid->pwm_output;
 }
+
 
 
 
@@ -127,7 +133,7 @@ void PID_Set_Motor_Parm(uint8_t motor_id, float kp, float ki, float kd)
     }
 }
 
-// Clearing PID Data  清除PID数据
+// Clearing PID Data
 void PID_Clear_Motor(uint8_t motor_id)
 {
     if (motor_id > MAX_MOTOR) return;
@@ -170,3 +176,8 @@ void PID_Set_Motor_Target(uint8_t motor_id, float target)
         pid_motor[motor_id].target_val = target;
     }
 }
+
+
+
+
+

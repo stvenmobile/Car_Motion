@@ -19,6 +19,7 @@
 #define MOTOR_IGNORE_PULSE  (1500)
 #define MOTOR_MAX_PULSE     (3600)
 #define MOTOR_FREQ_DIVIDE   (0)
+#define MAX_MOTOR            4
 
 
 typedef enum {
@@ -26,7 +27,6 @@ typedef enum {
     MOTOR_ID_M2,
     MOTOR_ID_M3,
     MOTOR_ID_M4,
-    MAX_MOTOR
 } Motor_ID;
 
 

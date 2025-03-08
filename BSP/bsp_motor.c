@@ -1,6 +1,6 @@
+#include "bsp.h"
 #include "bsp_uart.h"
 #include "bsp_motor.h"
-#include "bsp.h"
 #include "main.h"
 
 // Motor 1
