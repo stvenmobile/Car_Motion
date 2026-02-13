@@ -22,6 +22,7 @@
 extern uint8_t RxTemp;
 
 // Set to 1 to enable debug prints, 0 to disable
+#define DEBUG_ENABLE 1
 
 /* functions */
 void Bsp_Init(void);

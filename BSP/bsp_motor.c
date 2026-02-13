@@ -67,7 +67,7 @@ void Motor_Stop(uint8_t brake)
 // Set motor speed, speed:± (3600-MOTOR_IGNORE_PULSE), 0 indicates stop
 void Motor_Set_Pwm(uint8_t id, int16_t speed)
 {
-	speed = -speed;     // to account for reverse wiring of the motor.
+	// speed = -speed;     // to account for reverse wiring of the motor.
 
     int16_t pulse = Motor_Ignore_Dead_Zone(speed);
     // Limit input
@@ -163,5 +163,5 @@ void Motor_Hard_Brake(void)
     HAL_GPIO_WritePin(MOTOR_IN3_GPIO_Port, MOTOR_IN3_Pin, GPIO_PIN_SET);
     HAL_GPIO_WritePin(MOTOR_IN4_GPIO_Port, MOTOR_IN4_Pin, GPIO_PIN_SET);
 
-    Debug_Print("Hard Brake Engaged\r\n");
+    //Debug_Print("Hard Brake Engaged\r\n");
 }

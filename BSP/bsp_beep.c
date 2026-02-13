@@ -1,5 +1,6 @@
 #include "bsp.h"
 #include "bsp_beep.h"
+#include "bsp_uart.h" // For GetLatestVelocityX
 
 
 uint16_t beep_on_time = 0;
@@ -85,4 +86,44 @@ void Beep_Timeout_Close_Handle(void)
 	}
 }
 
+// Handle Backup Beep (Reverse Warning)
+void Backup_Beep_Handle(void)
+{
+    static uint32_t last_beep_time = 0;
+    static uint8_t beep_is_active = 0;
+    int vx = GetLatestVelocityX();
 
+    // Check if reversing (vx is negative)
+    // Using a small threshold to avoid noise
+    if (vx < -50)
+    {
+        uint32_t current_time = HAL_GetTick();
+        
+        // Toggle every 500ms
+        if (current_time - last_beep_time >= 500)
+        {
+            if (beep_is_active == 0)
+            {
+                // Turn Beep ON
+                Beep_On_Time(BEEP_STATE_ON_ALWAYS);
+                beep_is_active = 1;
+            }
+            else
+            {
+                // Turn Beep OFF
+                Beep_Off();
+                beep_is_active = 0;
+            }
+            last_beep_time = current_time;
+        }
+    }
+    else
+    {
+        // Not reversing, ensure beep is off if it was active
+        if (beep_is_active)
+        {
+            Beep_Off();
+            beep_is_active = 0;
+        }
+    }
+}

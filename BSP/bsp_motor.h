@@ -16,7 +16,7 @@
 #define PWM_M4_B  TIM1->CCR3
 
 
-#define MOTOR_IGNORE_PULSE  (1500)
+#define MOTOR_IGNORE_PULSE  (500)
 #define MOTOR_MAX_PULSE     (3600)
 #define MOTOR_FREQ_DIVIDE   (0)
 #define MAX_MOTOR            4

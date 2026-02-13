@@ -35,11 +35,20 @@ typedef struct _car_data_t
     int16_t Vz;
 } car_data_t;
 
+// Distance Control Structure
+typedef struct {
+    uint8_t  active;           // 1 = Move Distance Mode Active
+    int32_t  target_dist_mm;   // Target distance in mm (signed)
+    float    current_dist_mm;  // Accumulator for distance traveled
+    int16_t  speed_mm_s;       // Speed to travel at
+} motion_dist_t;
+
 
 
 void Motion_Stop(uint8_t brake);
 void Motion_Set_Pwm(int16_t Motor_1, int16_t Motor_2, int16_t Motor_3, int16_t Motor_4);
 void Motion_Ctrl(int16_t V_x, int16_t V_y, int16_t V_z);
+void Motion_Set_Distance(int32_t distance_mm, int16_t speed_mm_s); // New prototype
 
 void Motion_Get_Encoder(void);
 void Handle_Info_ResetEncoders();

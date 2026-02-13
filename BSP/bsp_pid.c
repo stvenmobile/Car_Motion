@@ -45,6 +45,7 @@ float PID_Incre_Calc(motor_pid_t *pid, float actual_val, int motor_index)
     if (pid->pwm_output < -MOTOR_MAX_PULSE) pid->pwm_output = -MOTOR_MAX_PULSE;
 
     // Debug print to monitor PID calculations (only every 10 cycles)
+    
     static uint32_t loop_counter = 0;
     loop_counter++;
     if (loop_counter >= 10)  // Adjust this value for desired frequency
@@ -59,6 +60,7 @@ float PID_Incre_Calc(motor_pid_t *pid, float actual_val, int motor_index)
 
         loop_counter = 0;
     }
+    
 
     // Ensure correct type casting to int32_t for motor control
     return (int32_t)pid->pwm_output;
@@ -83,6 +85,7 @@ void PID_Calc_Motor(motor_data_t* motor)
         // Convert to int32_t for motor driver
         motor->speed_pwm[i] = (int32_t)pwm;
 
+        /*
         static uint32_t loop_counter = 0;
         loop_counter++;
         if (loop_counter >= 10)
@@ -90,6 +93,7 @@ void PID_Calc_Motor(motor_data_t* motor)
             Debug_Print("Calling PID_Calc_Motor: Motor %d, Speed mm/s: %ld \r\n", i, motor->speed_pwm[i]);
             loop_counter = 0;
         }
+        */
     }
 }
 
@@ -99,6 +103,7 @@ void PID_Calc_Motor(motor_data_t* motor)
 // Set PID parameters, motor_id=4 set all, =0123 Set PID parameters of the corresponding motor
 void PID_Set_Motor_Parm(uint8_t motor_id, float kp, float ki, float kd)
 {
+	/*
 	static uint32_t loop_counter = 0;
 	loop_counter++;
 	if (loop_counter >= 10) {
@@ -106,6 +111,7 @@ void PID_Set_Motor_Parm(uint8_t motor_id, float kp, float ki, float kd)
 				                motor_id, kp, ki, kd);
 	    loop_counter = 0;
 	}
+	*/
 
     if (motor_id > MAX_MOTOR) return;
 
@@ -116,8 +122,8 @@ void PID_Set_Motor_Parm(uint8_t motor_id, float kp, float ki, float kd)
             pid_motor[i].Kp = kp;
             pid_motor[i].Ki = ki;
             pid_motor[i].Kd = kd;
-            Debug_Print(" -> motor[%d] Kp=%.2f, Ki=%.2f, Kd=%.2f\r\n",
-                                                i, pid_motor[i].Kp, pid_motor[i].Ki, pid_motor[i].Kd);
+            /* Debug_Print(" -> motor[%d] Kp=%.2f, Ki=%.2f, Kd=%.2f\r\n",
+                                                i, pid_motor[i].Kp, pid_motor[i].Ki, pid_motor[i].Kd); */
         }
     }
     else
@@ -125,11 +131,11 @@ void PID_Set_Motor_Parm(uint8_t motor_id, float kp, float ki, float kd)
         pid_motor[motor_id].Kp = kp;
         pid_motor[motor_id].Ki = ki;
         pid_motor[motor_id].Kd = kd;
-        Debug_Print(" -> motor[%d] Kp=%.2f, Ki=%.2f, Kd=%.2f\r\n",
+        /* Debug_Print(" -> motor[%d] Kp=%.2f, Ki=%.2f, Kd=%.2f\r\n",
                                     motor_id,
                                     pid_motor[motor_id].Kp,
                                     pid_motor[motor_id].Ki,
-                                    pid_motor[motor_id].Kd);
+                                    pid_motor[motor_id].Kd); */
     }
 }
 
