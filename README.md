@@ -11,6 +11,8 @@ The Car_Motion firmware:
 - ✅ Supports **quadrature encoders** for feedback  
 - ✅ Uses **PWM for motor speed control**  
 - ✅ Handles **serial communication & failsafe detection**  
+- ✅ Supports **ICM-20948 IMU & Orientation Tracking**
+
 
 ---
 
