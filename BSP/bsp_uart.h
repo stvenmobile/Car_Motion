@@ -25,6 +25,6 @@ void Handle_Info_Battery(void);
 void Handle_Info_PID(motor_data_t* motor);
 
 /* Data Accessors */
-int GetLatestVelocityX(void);
+int16_t GetLatestVelocityX(void);
 
 #endif /* __BSP_UART_H */

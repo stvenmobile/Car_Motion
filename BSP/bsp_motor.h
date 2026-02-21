@@ -16,8 +16,9 @@
 #define PWM_M4_B  TIM1->CCR3
 
 
-#define MOTOR_IGNORE_PULSE  (500)
-#define MOTOR_MAX_PULSE     (3600)
+
+#define MOTOR_IGNORE_PULSE  (1850)
+#define MOTOR_MAX_PULSE     (3200)
 #define MOTOR_FREQ_DIVIDE   (0)
 #define MAX_MOTOR            4
 
@@ -29,11 +30,13 @@ typedef enum {
     MOTOR_ID_M4,
 } Motor_ID;
 
+int16_t Motor_Ignore_Dead_Zone(int16_t pulse);
 
 void Motor_Init(void);
 void Motor_Set_Pwm(uint8_t id, int16_t speed);
 void Motor_Stop(uint8_t brake);
 void Motor_Hard_Brake(void);
+
 
 
 #endif
