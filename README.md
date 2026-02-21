@@ -148,27 +148,27 @@ The firmware now includes a comprehensive driver for the **ICM-20948 9-axis Moti
 ## **Current Status & To-Do**
 
 ### **✅ Completed**
-✔ **Quadrature encoder support**  
-✔ **PWM-based speed control** 
-✔ **Sensor Fusion Groundwork**: Successful integration of 6-axis IMU and 3-axis Magnetometer via SPI.
-✔ **Precise Orientation**: Implemented time-invariant Yaw integration to prevent drift during high CPU load.
-✔ **Hardware Scaling**: Synchronized silicon configuration with software constants for accurate physical mapping.
-✔ Serial communication with Raspberry Pi using ROS2 Serial Bridge 
-✔ Dead-Zone Compensation: Implemented an 1850 PWM floor to neutralize heavy-chassis stiction.
-✔ Fine-tuning PID gains for smoother acceleration 
-✔ Rotation Tuning: Adjusted robot_APB to 500 to compensate for Mecanum scrub friction during $V_z$ maneuvers.
+- ✔ **Quadrature encoder support**  
+- ✔ **PWM-based speed control** 
+- ✔ **Sensor Fusion Groundwork**: Successful integration of 6-axis IMU and 3-axis Magnetometer via SPI.
+- ✔ **Precise Orientation**: Implemented time-invariant Yaw integration to prevent drift during high CPU load.
+- ✔ **Hardware Scaling**: Synchronized silicon configuration with software constants for accurate physical mapping.
+- ✔ **Serial communication** with Raspberry Pi using ROS2 Serial Bridge 
+- ✔ **Dead-Zone Compensation:** Implemented an 1850 PWM floor to neutralize heavy-chassis stiction.
+- ✔ **Fine-tuning PID gains** for smoother acceleration 
+- ✔ **Rotation Tuning:** Adjusted robot_APB to 500 to compensate for Mecanum scrub friction during $V_z$ maneuvers.
 
 
 ### 🚧 In Progress
-🛠 Implementing better error handling for serial input  
-🛠 **Rviz Visualization**: Linking STM32 Odometry (Encoders + IMU) to ROS2 Jazzy for real-time obstacle mapping.
-🛠 **ROS2 Integration:** Developing the mecca_ws serial bridge to map Twist messages to the calibrated $V\ X\ Y\ Z$ range.
+- 🛠 Implementing better error handling for serial input  
+- 🛠 **Rviz Visualization**: Linking STM32 Odometry (Encoders + IMU) to ROS2 Jazzy for real-time obstacle mapping.
+- 🛠 **ROS2 Integration:** Developing the mecca_ws serial bridge to map Twist messages to the calibrated $V\ X\ Y\ Z$ range.
 
 
 ### 🔜 Future Improvements
-🚀 Add **sensor fusion** (combine encoders + IMU for better localization)  
-🚀 Improve **failsafe handling** (auto-stop on serial disconnection)  
-🚀 Support **additional sensors** for navigation  
+- 🚀 Add **sensor fusion** (combine encoders + IMU for better localization)  
+- 🚀 Improve **failsafe handling** (auto-stop on serial disconnection)  
+- 🚀 Support **additional sensors** for navigation  
 
 ---
 
