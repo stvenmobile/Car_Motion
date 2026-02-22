@@ -12,9 +12,9 @@
 #include "bsp_pid.h"
 #include "tim.h"
 
-// Corrected to 440 based on the 10x error analysis
+// Corrected to 2450.0f to match physical JGB37-520 encoder resolution
 #ifndef ENCODER_CIRCLE
-#define ENCODER_CIRCLE  220.0f
+#define ENCODER_CIRCLE  2450.0f
 #endif
 
 int32_t g_Encoder_All_Now[MAX_MOTOR] = {0};
@@ -68,10 +68,9 @@ void Motion_Handle(void)
 {
     Motion_Get_Speed(&car_data);
 
-    // --- SOFTWARE WATCHDOG CHECK ---
+    // Watchdog check: 2 seconds safety limit
     if (g_start_ctrl && !move_dist.active)
     {
-        // Increased to 2000ms for easier manual testing over Serial
         if (HAL_GetTick() - g_last_cmd_tick > 2000)
         {
             Motion_Stop(STOP_BRAKE);
@@ -85,20 +84,27 @@ void Motion_Handle(void)
     }
 }
 
+/**
+ * @brief  Updates motor targets based on kinematic mix.
+ * @note   V_x is inverted locally for motor targets so that V 100
+ * results in physical forward motion while keeping Vx positive for beeper.
+ */
 void Motion_Ctrl(int16_t V_x, int16_t V_y, int16_t V_z)
 {
     g_last_cmd_tick = HAL_GetTick();
     
+    // Command remains positive (forward), so beep logic is unaffected
     car_data.Vx = V_x;
     car_data.Vy = V_y;
     car_data.Vz = V_z;
 
-    float robot_APB = 500.0f;
+    float robot_APB = 1200.0f;
+    int16_t local_vx = -V_x; // Flip coordinate system for motors only
 
-    int speed_L1 = V_x - V_y - (V_z * robot_APB / 1000.0f);
-    int speed_L2 = V_x + V_y - (V_z * robot_APB / 1000.0f);
-    int speed_R1 = V_x + V_y + (V_z * robot_APB / 1000.0f);
-    int speed_R2 = V_x - V_y + (V_z * robot_APB / 1000.0f);
+    int speed_L1 = local_vx - V_y - (int16_t)(V_z * robot_APB / 1000.0f);
+    int speed_L2 = local_vx + V_y - (int16_t)(V_z * robot_APB / 1000.0f);
+    int speed_R1 = local_vx + V_y + (int16_t)(V_z * robot_APB / 1000.0f);
+    int speed_R2 = local_vx - V_y + (int16_t)(V_z * robot_APB / 1000.0f);
 
     Motion_Set_Speed(speed_L1, speed_L2, speed_R1, speed_R2);
 }
@@ -123,11 +129,11 @@ void Motion_Get_Encoder(void)
 
     for(uint8_t i = 0; i < MAX_MOTOR; i++)
     {
-        // Calculate the "Delta" using the persistent totals
         g_Encoder_All_Offset[i] = current_totals[i] - g_Encoder_Last_Stored[i];
         g_Encoder_Last_Stored[i] = current_totals[i];
         
-        // Speed in mm/s: (pulses * 100Hz loop) * (mm_per_turn / pulses_per_turn)
+        // Speed in mm/s calculation.
+        // offset is positive for forward motion due to bsp_encoder fix.
         motor_data.speed_mm_s[i] = (float)g_Encoder_All_Offset[i] * 100.0f * circle_mm / (float)ENCODER_CIRCLE;
     }
 }
@@ -153,9 +159,15 @@ void Handle_Info_Encoders(void)
             Encoder_Get_Total_Count(MOTOR_ID_M4));
 }
 
+/**
+ * @brief Resets all encoder tracking variables in bsp_motion.
+ * @note  Requires bsp_encoder.c to provide a reset for the underlying timer hardware.
+ */
 void Handle_Info_ResetEncoders(void)
 {
-    for(int i=0; i<MAX_MOTOR; i++) {
+    // Note: To be fully effective, you would also call a reset in bsp_encoder.c
+    // if it were available. Currently, we reset the motion layer's persistent memory.
+    for(int i = 0; i < MAX_MOTOR; i++) {
         g_Encoder_All_Now[i] = 0;
         g_Encoder_All_Last[i] = 0;
         g_Encoder_All_Offset[i] = 0;

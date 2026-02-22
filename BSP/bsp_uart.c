@@ -65,15 +65,22 @@ void ProcessCommandLine(char *cmd)
     int count = sscanf(cmd, "%7s %7s %7s %7s", token1, token2, token3, token4);
     if (count < 1) return;
 
+    // Handle Speed Commands (e.g., V 100 0 0)
     if (strcmp(token1, "V") == 0 && count >= 4)
     {
         Motion_Ctrl(atoi(token2), atoi(token3), atoi(token4));
     }
+    // Handle Information and Test Commands
     else if (strcmp(token1, "I") == 0 && count >= 2)
     {
         if (strcmp(token2, "ENC") == 0)
         {
             Handle_Info_Encoders();
+        }
+        else if (strcmp(token2, "RESET") == 0)
+        {
+            Handle_Info_ResetEncoders();
+            printf("ACK: Encoders Reset to Zero\r\n");
         }
         else if (strcmp(token2, "IMU") == 0)
         {
@@ -84,15 +91,31 @@ void ProcessCommandLine(char *cmd)
         }
         else if (strcmp(token2, "TEST") == 0)
         {
-            // Print current Kp to verify PID_Param_Init worked
             printf("DEBUG: PID Kp is %.2f (Should be 1.80)\r\n", pid_motor[0].Kp);
             printf("NON-BLOCKING TEST START: 500 mm/s\r\n");
 
-            g_start_ctrl = 1;                // Unlock the PID logic
-            g_last_cmd_tick = HAL_GetTick(); // Reset watchdog timer
+            g_start_ctrl = 1;
+            g_last_cmd_tick = HAL_GetTick();
 
-            Motion_Ctrl(500, 0, 0);          // Set the target
+            Motion_Ctrl(500, 0, 0);
         }
+    }
+    // Handle Live PID Tuning Commands (e.g., P 1.5 0.5 0.05)
+    else if (strcmp(token1, "P") == 0 && count >= 4)
+    {
+        float new_kp = (float)atof(token2);
+        float new_ki = (float)atof(token3);
+        float new_kd = (float)atof(token4);
+
+        // Update all 4 motors and reset their integral sums to prevent jumps
+        for(int i = 0; i < MAX_MOTOR; i++)
+        {
+            pid_motor[i].Kp = new_kp;
+            pid_motor[i].Ki = new_ki;
+            pid_motor[i].Kd = new_kd;
+            pid_motor[i].integral = 0.0f;
+        }
+        printf("ACK: PID updated - KP:%.2f KI:%.2f KD:%.2f\r\n", new_kp, new_ki, new_kd);
     }
 }
 

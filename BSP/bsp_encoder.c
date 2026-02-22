@@ -9,6 +9,9 @@ int32_t g_Encoder_M4_Now = 0;
 
 static int32_t encoder_offset[4] = {0, 0, 0, 0};
 
+/**
+ * @brief Read raw timer count and reset it
+ */
 static int16_t Encoder_Read_CNT(uint8_t Motor_id)
 {
     int16_t Encoder_TIM = 0;
@@ -23,23 +26,34 @@ static int16_t Encoder_Read_CNT(uint8_t Motor_id)
     return Encoder_TIM;
 }
 
-// Signs flipped so "Forward" = Positive Velocity
+/**
+  * @brief  Updates global encoder counts.
+  * @note   Signs flipped to ensure Forward Motion = Positive Count.
+  * Based on manual test where forward push reported negative values.
+  */
 void Encoder_Update_Count(void)
 {
-    g_Encoder_M1_Now += Encoder_Read_CNT(MOTOR_ID_M1); // Swapped - to +
-    g_Encoder_M2_Now -= Encoder_Read_CNT(MOTOR_ID_M2); // Swapped + to -
-    g_Encoder_M3_Now -= Encoder_Read_CNT(MOTOR_ID_M3); // Swapped + to -
-    g_Encoder_M4_Now += Encoder_Read_CNT(MOTOR_ID_M4); // Swapped - to +
+    // Polarity adjusted so forward rotation increments the count
+    g_Encoder_M1_Now -= Encoder_Read_CNT(MOTOR_ID_M1);
+    g_Encoder_M2_Now += Encoder_Read_CNT(MOTOR_ID_M2);
+    g_Encoder_M3_Now += Encoder_Read_CNT(MOTOR_ID_M3);
+    g_Encoder_M4_Now -= Encoder_Read_CNT(MOTOR_ID_M4);
 
     static uint32_t reset_counter = 0;
     if (++reset_counter >= 10000)
     {
-        for(int i=0; i<4; i++) encoder_offset[i] += (&g_Encoder_M1_Now)[i];
+        encoder_offset[0] += g_Encoder_M1_Now;
+        encoder_offset[1] += g_Encoder_M2_Now;
+        encoder_offset[2] += g_Encoder_M3_Now;
+        encoder_offset[3] += g_Encoder_M4_Now;
         g_Encoder_M1_Now = g_Encoder_M2_Now = g_Encoder_M3_Now = g_Encoder_M4_Now = 0;
         reset_counter = 0;
     }
 }
 
+/**
+ * @brief Returns persistent total count for a motor
+ */
 int32_t Encoder_Get_Total_Count(uint8_t Motor_id)
 {
     if (Motor_id == MOTOR_ID_M1) return encoder_offset[0] + g_Encoder_M1_Now;
@@ -49,6 +63,9 @@ int32_t Encoder_Get_Total_Count(uint8_t Motor_id)
     return 0;
 }
 
+/**
+ * @brief Start timer encoder modes
+ */
 void Encoder_Init(void)
 {
     HAL_TIM_Encoder_Start(&htim2, TIM_CHANNEL_1 | TIM_CHANNEL_2);
