@@ -168,6 +168,8 @@ The firmware includes a driver for the **ICM-20948 9-axis MotionTracking device*
 - ✔ **Serial Stability**: Removed automatic 10 Hz PID telemetry flood; output is now on-demand only
 - ✔ **Accurate Speed Measurement**: Speed calculation uses measured inter-call dt instead of hardcoded 100 Hz
 - ✔ **PID Range Fix**: Pre-clamp on raw PID output ensures full control range maps correctly through dead-zone addition
+- ✔ **Encoder Constant Cleanup**: Removed dead `#ifndef ENCODER_CIRCLE` guard in `bsp_motion.c`; the correct value 2420 defined in `bsp_encoder.h` is now the single source of truth
+- ✔ **Diagnostic Sequence Fix**: `I DIAG` command now uses `MOTOR_IGNORE_PULSE + 200 = 1450` PWM directly, guaranteeing each motor spins during the test (previously 200 raw was below the stall threshold)
 
 ### 🚧 In Progress
 - 🛠 **Rviz Visualization**: Linking STM32 Odometry (Encoders + IMU) to ROS2 Jazzy for real-time obstacle mapping
