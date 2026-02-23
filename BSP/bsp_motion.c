@@ -12,13 +12,6 @@
 #include "bsp_pid.h"
 #include "tim.h"
 
-/**
- * @brief Encoder resolution (ticks per revolution).
- * @note  Matches the JGB37-520 hardware specification.
- */
-#ifndef ENCODER_CIRCLE
-#define ENCODER_CIRCLE  2450.0f
-#endif
 
 int32_t g_Encoder_All_Now[MAX_MOTOR] = {0};
 int g_Encoder_All_Last[MAX_MOTOR] = {0};
