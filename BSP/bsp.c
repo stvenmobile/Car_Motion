@@ -42,6 +42,7 @@ void Bsp_Loop(void)
     static uint32_t last_rgb_tick = 0;
 
     // 1. Time-Critical Locomotion & Housekeeping
+    Command_Handler();       // Process any pending serial command (safe main-loop context)
     Bsp_Led_Show_State_Handle();
     Beep_Timeout_Close_Handle();
     Backup_Beep_Handle();

@@ -9,6 +9,11 @@
 #define YAW_ADJUST           (1)
 #define YAW_NO_ADJUST        (0)
 
+// Safety watchdog: stop motors if no V command is received within this many ms.
+// 1000ms gives a 1-second window for manual serial-monitor testing while still
+// providing a safe cut-off if the ROS2 serial bridge drops.
+#define CMD_WATCHDOG_TIMEOUT_MS  1000
+
 // Update to match the 96mm wheels
 #define MECANUM_MINI_CIRCLE_MM       (301.6f)
 #define MECANUM_MINI_APB             (150.0f)

@@ -9,6 +9,11 @@
 motor_data_t motor_data;
 motor_pid_t pid_motor[MAX_MOTOR] = {0};
 
+// Number of 10ms PID cycles over which the dead-zone floor is linearly ramped
+// from 0 to MOTOR_IGNORE_PULSE on motor startup (20 cycles = ~200ms).
+// This staggers the effective inrush current and prevents supply brownouts.
+#define STARTUP_RAMP_CYCLES  20
+
 /**
   * @brief  Initializes PID parameters for all motors using constants from bsp_pid.h
   */
@@ -39,9 +44,10 @@ float PID_Positional_Calc(motor_pid_t *pid, float actual_val)
     // Accumulate integral (I)
     pid->integral += pid->err;
 
-    // Anti-Windup: Prevent the integral from growing infinitely if the robot is stuck
-    if (pid->integral > 1500.0f) pid->integral = 1500.0f;
-    if (pid->integral < -1500.0f) pid->integral = -1500.0f;
+    // Anti-Windup: Limit the integral term to prevent runaway if the wheel is stalled
+    // Set to 2000.0f to provide enough "reach" for the 3200 max pulse
+    if (pid->integral > 2000.0f) pid->integral = 2000.0f;
+    if (pid->integral < -2000.0f) pid->integral = -2000.0f;
 
     // Calculate derivative (D)
     float derivative = pid->err - pid->err_last;
@@ -52,7 +58,7 @@ float PID_Positional_Calc(motor_pid_t *pid, float actual_val)
     // Save error for next cycle
     pid->err_last = pid->err;
 
-    // Hard safety clamp to your defined MOTOR_MAX_PULSE (e.g., 2200)
+    // Hard safety clamp to defined MOTOR_MAX_PULSE
     if (pid->pwm_output > MOTOR_MAX_PULSE)  pid->pwm_output = (float)MOTOR_MAX_PULSE;
     if (pid->pwm_output < -MOTOR_MAX_PULSE) pid->pwm_output = (float)-MOTOR_MAX_PULSE;
 
@@ -65,28 +71,45 @@ float PID_Positional_Calc(motor_pid_t *pid, float actual_val)
   */
 void PID_Calc_Motor(motor_data_t* motor)
 {
-    static uint32_t log_counter = 0;
-    log_counter++;
-
     for (int i = 0; i < MAX_MOTOR; i++)
     {
         // Calculate raw PID adjustment
         float raw_pwm = PID_Positional_Calc(&pid_motor[i], motor->speed_mm_s[i]);
 
-        // APPLY THE FLOOR: This jumps the 1450 PWM gap to overcome physical friction
-        int16_t final_pwm = Motor_Ignore_Dead_Zone((int16_t)raw_pwm);
-        motor->speed_pwm[i] = (float)final_pwm;
-        
-        // Log output every 50 cycles (~500ms) for serial debugging
-        if (log_counter >= 50)
+        // APPLY THE FLOOR WITH SOFT-START RAMP:
+        // Instead of jumping to MOTOR_IGNORE_PULSE immediately (which causes a large
+        // inrush current surge across all 4 motors), linearly scale the dead-zone
+        // floor from 0 up to MOTOR_IGNORE_PULSE over STARTUP_RAMP_CYCLES iterations.
+        // Each motor ramps independently; the counter resets when the motor stops.
+        int16_t raw_i16 = (int16_t)raw_pwm;
+        int16_t final_pwm;
+
+        if (raw_i16 > 5 || raw_i16 < -5)
         {
-            char msg[80];
-            snprintf(msg, sizeof(msg), "M%d: T:%.1f A:%.1f OUT:%d\r\n",
-                     i, pid_motor[i].target_val, motor->speed_mm_s[i], final_pwm);
-            USART1_Send_ArrayU8((uint8_t *)msg, strlen(msg));
+            // Pre-clamp: keep raw PID output within ±(MOTOR_MAX_PULSE - MOTOR_IGNORE_PULSE).
+            // Without this, PID_Positional_Calc can return up to ±MOTOR_MAX_PULSE (3200),
+            // and adding MOTOR_IGNORE_PULSE (1250) would give ±4450 — which Motor_Set_Pwm
+            // then silently re-clamps to 3200.  That makes the PID's control range appear
+            // to saturate at raw=1950 while the integral keeps winding up past that point.
+            // With this clamp the full [raw + floor] range maps exactly to [0, MOTOR_MAX_PULSE].
+            const int16_t max_raw = (int16_t)(MOTOR_MAX_PULSE - MOTOR_IGNORE_PULSE); // 1950
+            if (raw_i16 >  max_raw) raw_i16 =  max_raw;
+            if (raw_i16 < -max_raw) raw_i16 = -max_raw;
+
+            uint8_t ramp = pid_motor[i].startup_ramp_cnt;
+            if (ramp < STARTUP_RAMP_CYCLES) pid_motor[i].startup_ramp_cnt++;
+            int16_t scaled_floor = (int16_t)((float)MOTOR_IGNORE_PULSE * ramp / STARTUP_RAMP_CYCLES);
+            final_pwm = (raw_i16 > 0) ? (raw_i16 + scaled_floor) : (raw_i16 - scaled_floor);
         }
+        else
+        {
+            // Output is in the dead band — hold ramp at zero so it restarts cleanly.
+            pid_motor[i].startup_ramp_cnt = 0;
+            final_pwm = 0;
+        }
+
+        motor->speed_pwm[i] = (float)final_pwm;
     }
-    if (log_counter >= 50) log_counter = 0;
 }
 
 /**
@@ -118,6 +141,7 @@ void PID_Clear_Motor(uint8_t motor_id)
             pid_motor[i].err_last = 0.0f;
             pid_motor[i].integral = 0.0f;
             pid_motor[i].target_val = 0.0f;
+            pid_motor[i].startup_ramp_cnt = 0;
         }
     }
     else
@@ -127,11 +151,12 @@ void PID_Clear_Motor(uint8_t motor_id)
         pid_motor[motor_id].err_last = 0.0f;
         pid_motor[motor_id].integral = 0.0f;
         pid_motor[motor_id].target_val = 0.0f;
+        pid_motor[motor_id].startup_ramp_cnt = 0;
     }
 }
 
 /**
-  * @brief  Dynamically update PID gains (Useful for ROS2 teleop tuning)
+  * @brief  Dynamically update PID gains
   */
 void PID_Set_Motor_Parm(uint8_t motor_id, float Kp, float Ki, float Kd)
 {

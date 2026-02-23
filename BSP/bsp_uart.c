@@ -11,6 +11,7 @@
 #include "usart.h"
 #include "bsp_icm20948.h"
 #include "bsp_motion.h"
+#include "bsp_motor.h"
 
 // Prototype to clear IDE warnings
 void ProcessCommandLine(char *cmd);
@@ -22,6 +23,8 @@ extern float g_last_loop_time;
 extern uint32_t g_last_cmd_tick;
 
 char cmd_buffer[64];
+static char cmd_pending[64];
+static volatile uint8_t cmd_ready = 0;
 uint8_t cmd_index = 0;
 uint8_t RxTemp = 0;
 
@@ -38,11 +41,18 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     {
         if (RxTemp == '\r' || RxTemp == '\n')
         {
-            if (cmd_index > 0) 
+            if (cmd_index > 0)
             {
-                cmd_buffer[cmd_index] = '\0';
-                ProcessCommandLine(cmd_buffer);
-                cmd_index = 0; 
+                if (!cmd_ready)
+                {
+                    // Safe handoff: copy complete command and set flag for main-loop processing.
+                    // ProcessCommandLine must NOT be called here — this is ISR context and
+                    // USART1 is at priority 0, so HAL_Delay / printf inside it would deadlock.
+                    cmd_buffer[cmd_index] = '\0';
+                    memcpy(cmd_pending, cmd_buffer, cmd_index + 1);
+                    cmd_ready = 1;
+                }
+                cmd_index = 0;
             }
         }
         else
@@ -99,6 +109,15 @@ void ProcessCommandLine(char *cmd)
 
             Motion_Ctrl(500, 0, 0);
         }
+        else if (strcmp(token2, "DIAG") == 0)
+        {
+            Motor_Diagnostic_Sequence();
+        }
+        //*  **The Isolation Test**:
+        //* Unplug all 4 motor cables from the expansion board.
+        //* Send the `DIAG` command.
+        //* If the garbage still appears, the issue is internal to the MCU configuration (Timer/Pin conflict).
+        //* If the garbage disappears, plug in the motors **one at a time** and repeat the test.
     }
     // Handle Live PID Tuning Commands (e.g., P 1.5 0.5 0.05)
     else if (strcmp(token1, "P") == 0 && count >= 4)
@@ -129,6 +148,20 @@ PUTCHAR_PROTOTYPE
 {
     HAL_UART_Transmit(&huart1, (uint8_t *)&ch, 1, 0xFFFF);
     return ch;
+}
+
+/**
+ * @brief  Poll for a pending serial command and dispatch it.
+ * @note   Must be called from the main loop (non-ISR context) so that
+ *         printf, HAL_Delay, and other blocking calls inside handlers are safe.
+ */
+void Command_Handler(void)
+{
+    if (cmd_ready)
+    {
+        cmd_ready = 0;
+        ProcessCommandLine(cmd_pending);
+    }
 }
 
 void USART1_Send_ArrayU8(uint8_t *BufferPtr, uint16_t Length)

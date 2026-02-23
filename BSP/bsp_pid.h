@@ -24,6 +24,7 @@ typedef struct {
     float Kp, Ki, Kd;
     float err, err_last;
     float integral;
+    uint8_t startup_ramp_cnt;  // Soft-start: ramps dead-zone floor from 0→full over STARTUP_RAMP_CYCLES
 } motor_pid_t;
 
 extern motor_pid_t pid_motor[MAX_MOTOR];
