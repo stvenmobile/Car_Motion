@@ -113,11 +113,35 @@ void ProcessCommandLine(char *cmd)
         {
             Motor_Diagnostic_Sequence();
         }
-        //*  **The Isolation Test**:
-        //* Unplug all 4 motor cables from the expansion board.
-        //* Send the `DIAG` command.
-        //* If the garbage still appears, the issue is internal to the MCU configuration (Timer/Pin conflict).
-        //* If the garbage disappears, plug in the motors **one at a time** and repeat the test.
+        else if (strcmp(token2, "PID") == 0)
+        {
+            // Snapshot of PID state: target speed, actual speed, PWM output per motor.
+            // Send while motors are running to see what the PID is computing.
+            printf("I PID FL:T=%.0f A=%.0f P=%.0f | RL:T=%.0f A=%.0f P=%.0f | FR:T=%.0f A=%.0f P=%.0f | RR:T=%.0f A=%.0f P=%.0f\r\n",
+                   pid_motor[0].target_val, motor_data.speed_mm_s[0], motor_data.speed_pwm[0],
+                   pid_motor[1].target_val, motor_data.speed_mm_s[1], motor_data.speed_pwm[1],
+                   pid_motor[2].target_val, motor_data.speed_mm_s[2], motor_data.speed_pwm[2],
+                   pid_motor[3].target_val, motor_data.speed_mm_s[3], motor_data.speed_pwm[3]);
+        }
+    }
+    // Handle Direct Motor Test Command (e.g., M 4 1500)
+    // Stops PID and applies PWM directly to one port. Motor id is 1-based (1=FL,2=RL,3=FR,4=RR).
+    // Positive PWM = A-lead driven, negative = B-lead driven. Use to test port wiring and polarity.
+    else if (strcmp(token1, "M") == 0 && count >= 3)
+    {
+        int motor_id = atoi(token2) - 1;  // convert 1-based user input to 0-based enum
+        int pwm_val  = atoi(token3);
+
+        if (motor_id >= 0 && motor_id < MAX_MOTOR)
+        {
+            Motion_Stop(STOP_FREE);                          // kill PID so it doesn't fight manual PWM
+            Motor_Set_Pwm((uint8_t)motor_id, (int16_t)pwm_val);
+            printf("ACK: M%d direct PWM=%d (PID stopped)\r\n", motor_id + 1, pwm_val);
+        }
+        else
+        {
+            printf("ERR: motor id must be 1-4\r\n");
+        }
     }
     // Handle Live PID Tuning Commands (e.g., P 1.5 0.5 0.05)
     else if (strcmp(token1, "P") == 0 && count >= 4)
