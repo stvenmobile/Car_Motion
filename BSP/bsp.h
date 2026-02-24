@@ -11,6 +11,9 @@
 #include "bsp_encoder.h"
 #include "stdio.h"
 
+// Firmware version — increment before every flash so the boot message confirms the build.
+#define FW_VERSION "1.0.0"
+
 #define MAX_MOTOR 4  // Ensure it's only defined once
 
 /* DEFINE */

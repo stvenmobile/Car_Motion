@@ -33,7 +33,7 @@ void Bsp_Init(void)
     PID_Param_Init(); // <--- ADD THIS LINE TO LOAD PID GAINS
 
     printf("IMU initialization complete...\r\n");
-    printf("Mecca Robot initialization complete...\r\n");
+    printf("Mecca Robot initialization complete. FW v%s\r\n", FW_VERSION);
     Beep_On_Time(50);
 }
 
