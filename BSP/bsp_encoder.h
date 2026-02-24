@@ -9,6 +9,7 @@
 
 void Encoder_Init(void);
 void Encoder_Update_Count(void);
+void Encoder_Reset_All(void);
 int32_t Encoder_Get_Count_Now(uint8_t Motor_id);
 int32_t Encoder_Get_Total_Count(uint8_t Motor_id);
 void Encoder_Get_ALL(int32_t* Encoder_all);

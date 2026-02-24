@@ -226,6 +226,7 @@ void Handle_Info_Encoders(void)
  */
 void Handle_Info_ResetEncoders(void)
 {
+    Encoder_Reset_All();  // zeros g_Encoder_M*_Now and encoder_offset[]
     for(int i = 0; i < MAX_MOTOR; i++) {
         g_Encoder_All_Now[i] = 0;
         g_Encoder_All_Last[i] = 0;

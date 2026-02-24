@@ -71,3 +71,13 @@ void Encoder_Init(void)
     HAL_TIM_Encoder_Start(&htim4, TIM_CHANNEL_1 | TIM_CHANNEL_2);
     HAL_TIM_Encoder_Start(&htim5, TIM_CHANNEL_1 | TIM_CHANNEL_2);
 }
+
+/**
+ * @brief Resets all encoder accumulators and offsets to zero.
+ *        Call this to zero-reference the odometry position.
+ */
+void Encoder_Reset_All(void)
+{
+    g_Encoder_M1_Now = g_Encoder_M2_Now = g_Encoder_M3_Now = g_Encoder_M4_Now = 0;
+    for (int i = 0; i < 4; i++) encoder_offset[i] = 0;
+}

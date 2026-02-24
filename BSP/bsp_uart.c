@@ -12,6 +12,7 @@
 #include "bsp_icm20948.h"
 #include "bsp_motion.h"
 #include "bsp_motor.h"
+#include "bsp_encoder.h"
 
 // Prototype to clear IDE warnings
 void ProcessCommandLine(char *cmd);
@@ -125,8 +126,9 @@ void ProcessCommandLine(char *cmd)
         }
     }
     // Handle Direct Motor Test Command (e.g., M 4 1500)
-    // Stops PID and applies PWM directly to one port. Motor id is 1-based (1=FL,2=RL,3=FR,4=RR).
-    // Positive PWM = A-lead driven, negative = B-lead driven. Use to test port wiring and polarity.
+    // Stops PID and applies PWM directly to one port for exactly 3 seconds, then hard-brakes.
+    // Motor id is 1-based (1=FL,2=RL,3=FR,4=RR). Positive/negative PWM sets direction.
+    // Encoders are sampled every 10ms during the run for accurate odometry.
     else if (strcmp(token1, "M") == 0 && count >= 3)
     {
         int motor_id = atoi(token2) - 1;  // convert 1-based user input to 0-based enum
@@ -134,9 +136,22 @@ void ProcessCommandLine(char *cmd)
 
         if (motor_id >= 0 && motor_id < MAX_MOTOR)
         {
+            Encoder_Reset_All();
             Motion_Stop(STOP_FREE);                          // kill PID so it doesn't fight manual PWM
             Motor_Set_Pwm((uint8_t)motor_id, (int16_t)pwm_val);
-            printf("ACK: M%d direct PWM=%d (PID stopped)\r\n", motor_id + 1, pwm_val);
+            printf("ACK: M%d PWM=%d running 3s...\r\n", motor_id + 1, pwm_val);
+
+            for (int t = 0; t < 300; t++) {
+                HAL_Delay(10);
+                Encoder_Update_Count();
+            }
+
+            Motor_Hard_Brake();
+            printf("I ENC %ld %ld %ld %ld\r\n",
+                   Encoder_Get_Total_Count(MOTOR_ID_M1),
+                   Encoder_Get_Total_Count(MOTOR_ID_M2),
+                   Encoder_Get_Total_Count(MOTOR_ID_M3),
+                   Encoder_Get_Total_Count(MOTOR_ID_M4));
         }
         else
         {
