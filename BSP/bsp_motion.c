@@ -95,13 +95,17 @@ void Handle_Info_PID(motor_data_t* motor)
 void Motion_Handle(void)
 {
     // --- SAFETY WATCHDOG ---
-    // Stops motors if no command is received within 500ms
+    // Stops motors if no command is received within CMD_WATCHDOG_TIMEOUT_MS.
+    // Uses STOP_FREE (CCR=0, all PWM pins held LOW) rather than STOP_BRAKE so
+    // that TIM1/TIM8 stop switching at 20 kHz.  Brake mode leaves both PWM
+    // outputs toggling at 88.9% duty which couples 20 kHz EMI into adjacent
+    // encoder signal wires and causes phantom encoder counts.
     if (g_start_ctrl)
     {
         uint32_t current_tick = HAL_GetTick();
         if (current_tick - g_last_cmd_tick > CMD_WATCHDOG_TIMEOUT_MS)
         {
-            Motion_Stop(STOP_BRAKE);
+            Motion_Stop(STOP_FREE);
             return;
         }
     }
@@ -135,7 +139,7 @@ void Motion_Ctrl(int16_t V_x, int16_t V_y, int16_t V_z)
 
     if (V_x == 0 && V_y == 0 && V_z == 0)
     {
-        Motion_Stop(STOP_BRAKE);
+        Motion_Stop(STOP_FREE);  // STOP_FREE: no 20kHz switching, no encoder EMI
         return;
     }
 
