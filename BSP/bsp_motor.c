@@ -111,10 +111,10 @@ void Motor_Set_Pwm(uint8_t id, int16_t speed)
 
         case MOTOR_ID_M4: // Port M4 (RR) — N-channels CH2N/CH3N (inverted)
             // Pin HIGH when CNT >= CCR, so effective duty = (TIM1_ARR - CCR) / TIM1_ARR.
-            // To drive forward at +pulse: A = pulse duty → CCR2 = TIM1_ARR - pulse; B = 0% → CCR3 = TIM1_ARR.
-            // To drive reverse at -pulse: A = 0%         → CCR2 = TIM1_ARR;         B = |pulse| duty → CCR3 = TIM1_ARR - |pulse|.
-            if (pulse >= 0) { PWM_M4_AN = TIM1_ARR - pulse; PWM_M4_BN = TIM1_ARR; }
-            else            { PWM_M4_AN = TIM1_ARR;         PWM_M4_BN = TIM1_ARR + pulse; }
+            // To drive forward at +pulse: B = pulse duty → CCR3 = TIM1_ARR - pulse; A = 0% → CCR2 = TIM1_ARR.
+            // To drive reverse at -pulse: B = 0%         → CCR3 = TIM1_ARR;         A = |pulse| duty → CCR2 = TIM1_ARR - |pulse|.
+            if (pulse >= 0) { PWM_M4_AN = TIM1_ARR;         PWM_M4_BN = TIM1_ARR - pulse; }
+            else            { PWM_M4_AN = TIM1_ARR + pulse; PWM_M4_BN = TIM1_ARR; }
             break;
 
         default:
