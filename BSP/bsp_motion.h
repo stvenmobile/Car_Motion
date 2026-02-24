@@ -12,7 +12,7 @@
 // Safety watchdog: stop motors if no V command is received within this many ms.
 // 1000ms gives a 1-second window for manual serial-monitor testing while still
 // providing a safe cut-off if the ROS2 serial bridge drops.
-#define CMD_WATCHDOG_TIMEOUT_MS  1000
+#define CMD_WATCHDOG_TIMEOUT_MS  5000
 
 // Update to match the 96mm wheels
 #define MECANUM_MINI_CIRCLE_MM       (301.6f)
