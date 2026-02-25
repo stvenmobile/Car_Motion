@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add BSP/bsp.c BSP/bsp_motion.c BSP/bsp_motion.h BSP/bsp_pid.c BSP/bsp_pid.h BSP/bsp_uart.c && git commit -m \"$\\(cat <<'EOF'\nFix 6 critical/serious firmware bugs causing serial brownouts and motor failure.\n\nCritical fixes:\n- bsp_uart.c: Defer ProcessCommandLine\\(\\) out of UART ISR \\(priority 0\\) via\n  cmd_ready/cmd_pending flag polled by new Command_Handler\\(\\) in main loop.\n  Prevents HAL_Delay/printf deadlock \\(e.g. I DIAG freezing the MCU\\).\n- bsp.c: Call Command_Handler\\(\\) each Bsp_Loop iteration.\n- bsp_motion.c: Remove automatic 10Hz Handle_Info_PID\\(\\) printf flood from\n  Motion_Handle\\(\\); unsolicited output corrupted the serial terminal.\n- bsp_pid.c/h: Add per-motor soft-start ramp \\(STARTUP_RAMP_CYCLES=20, ~200ms\\)\n  that linearly scales the dead-zone floor from 0 to MOTOR_IGNORE_PULSE on\n  startup, preventing the simultaneous 4-motor inrush current brownout.\n\nSerious fixes:\n- bsp_motion.h: Define CMD_WATCHDOG_TIMEOUT_MS=1000 \\(was magic number 500ms\\);\n  gives a usable window for single-shot serial-monitor testing.\n- bsp_motion.c: Replace hardcoded 100.0f speed multiplier with a measured\n  inter-call dt via HAL_GetTick\\(\\); actual loop is ~12-15ms, not 10ms.\n- bsp_pid.c: Pre-clamp raw PID output to ±\\(MOTOR_MAX_PULSE-MOTOR_IGNORE_PULSE\\)\n  = ±1950 before dead-zone addition so the full output range maps cleanly to\n  [0, MOTOR_MAX_PULSE] without a hidden saturation plateau.\n\nCo-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(find /mnt/f/STM32_workspace/mecca_motion/Core/Src -name \"*.c\" | xargs ls -la)",
+      "Bash(grep -r \"#include\\\\|#define\" /mnt/f/STM32_workspace/mecca_motion/BSP/*.h | head -30)",
+      "Bash(wc -l /mnt/f/STM32_workspace/mecca_motion/BSP/*.{c,h} /mnt/f/STM32_workspace/mecca_motion/Core/Src/*.c /mnt/f/STM32_workspace/mecca_motion/Core/Inc/*.h 2>/dev/null | tail -1)"
+    ]
+  }
+}
